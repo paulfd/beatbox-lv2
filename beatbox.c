@@ -25,20 +25,20 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
-#include <lv2/atom/forge.h>
-#include <lv2/atom/util.h>
-#include <lv2/buf-size/buf-size.h>
-#include <lv2/core/lv2.h>
-#include <lv2/core/lv2_util.h>
-#include <lv2/midi/midi.h>
-#include <lv2/options/options.h>
-#include <lv2/parameters/parameters.h>
-#include <lv2/patch/patch.h>
-#include <lv2/state/state.h>
-#include <lv2/urid/urid.h>
-#include <lv2/worker/worker.h>
-#include <lv2/log/logger.h>
-#include <lv2/log/log.h>
+#include "lv2/atom/forge.h"
+#include "lv2/atom/util.h"
+#include "lv2/buf-size/buf-size.h"
+#include "lv2/core/lv2.h"
+#include "lv2/core/lv2_util.h"
+#include "lv2/midi/midi.h"
+#include "lv2/options/options.h"
+#include "lv2/parameters/parameters.h"
+#include "lv2/patch/patch.h"
+#include "lv2/state/state.h"
+#include "lv2/urid/urid.h"
+#include "lv2/worker/worker.h"
+#include "lv2/log/logger.h"
+#include "lv2/log/log.h"
 
 #include <math.h>
 #include <sfizz.h>
@@ -570,29 +570,19 @@ run(LV2_Handle instance, uint32_t sample_count)
     //     self->main_switched = false;
     //     sfizz_lv2_send_status(self);
     // }
-
-    const float *const main_sentinel = self->main_p + sample_count;
-    for (const float *main = self->main_p; main < main_sentinel; main++)
+    if ((bool)*self->main_p)
     {
-        if ((bool)*main)
-        {
-            if (!self->main_switched)
-            {
-                self->main_switched = true;
-                lv2_log_note(&self->logger, "[run] Main switch on %ld (float value %f)\n", main - self->main_p, *main);
-                sfizz_lv2_send_status(self);
-            }
-        }
-        else
-        {
-            if (self->main_switched)
-            {
-                self->main_switched = false;
-                lv2_log_note(&self->logger, "[run] Main switch off %ld (float value %f)\n", main - self->main_p, *main);
-                sfizz_lv2_send_status(self);
-            }
-        }
+        self->main_switched = true;
+        lv2_log_note(&self->logger, "[run] Main switch pressed\n");
+        sfizz_lv2_send_status(self);
     }
+    else
+    {
+        self->main_switched = false;
+        sfizz_lv2_send_status(self);
+        /* code */
+    }
+    
 
     // const float *const accent_sentinel = self->accent_p + sample_count;
     // for (const float *accent = self->accent_p; accent < accent_sentinel; accent++)

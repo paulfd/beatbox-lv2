@@ -8,6 +8,7 @@ project(beatbox-lv2)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_library(beatbox-lv2 SHARED beatbox.c)
+target_include_directories(beatbox-lv2 PRIVATE .)
 set_target_properties(beatbox-lv2 PROPERTIES PREFIX "")
 set_target_properties(beatbox-lv2 PROPERTIES OUTPUT_NAME "beatbox")
 
